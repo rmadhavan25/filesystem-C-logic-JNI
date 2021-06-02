@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     controllers_GetFiles
  * Method:    getFiles
- * Signature: (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_controllers_GetFiles_getFiles
-  (JNIEnv *, jobject, jstring, jstring);
+  (JNIEnv *, jobject, jstring, jstring, jint);
 
 #ifdef __cplusplus
 }

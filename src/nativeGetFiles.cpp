@@ -15,82 +15,44 @@
 using namespace std;
 
 
-jstring JNICALL Java_controllers_GetFiles_getFiles
-  (JNIEnv *env, jobject, jstring directory, jstring keyword, jint skip){
+void JNICALL Java_controllers_GetFiles_getFiles
+  (JNIEnv *env, jobject thisObj, jstring directory, jstring keyword){
 
-			const char *path = env->GetStringUTFChars(directory,NULL);
-			const char *key = env->GetStringUTFChars(keyword, NULL);
-			struct dirent *entry;
-			std::string res;
-			DIR *dir = opendir(path);
-			if (dir == NULL) {
-			   return env->NewStringUTF("null");
-			}
-			else{
+		const char *path = env->GetStringUTFChars(directory,NULL);
+		const char *key = env->GetStringUTFChars(keyword, NULL);
 
-			  while ((entry = readdir(dir)) != NULL) {
-				   string st = entry->d_name;
-			       string k = key;
-			       string direc = path;
+		//loading the calling class object
+		jclass thisClass = env->GetObjectClass(thisObj);
 
-			       transform(st.begin(), st.end(), st.begin(), ::tolower);
-			       transform(k.begin(), k.end(), k.begin(), ::tolower);
-			       if(st.find(k) !=string::npos){
-			    	   if(skip>0){
-			    	   		skip--;
-			    	   		continue;
-			    	   	}
-			    	   res = st;
-			    	   break;
+	   //calling the class method
+		jmethodID addFileMethod = env->GetMethodID(thisClass,
+	                                  "addFile", "(Ljava/lang/String;)V");
+	    struct dirent *entry;
+	    DIR *dir = opendir(path);
+	    if (dir == NULL) {
+	    	  jstring notFound = env->NewStringUTF("NULL");
+	    	  env->CallVoidMethod(thisObj, addFileMethod, notFound);
+	    }
+	    else{
+	    	while ((entry = readdir(dir)) != NULL) {
+	      	       string st = entry->d_name;
+	      	       string k = key;
+	      	       string direc = path;
 
-			       }
+	      	       transform(st.begin(), st.end(), st.begin(), ::tolower);
+	      	       transform(k.begin(), k.end(), k.begin(), ::tolower);
+	      	       if(st.find(k) !=string::npos){
+	      	    	   cout<< "inside cpp" << endl;
+	      	    	 jstring fileName = env->NewStringUTF(entry->d_name);
+	      	    	 env->CallVoidMethod(thisObj, addFileMethod, fileName);
 
-			   }
+	      	       }
+
+	      	   }
+	      }
 
 
-
-			   }
-			 closedir(dir);
-			 return env->NewStringUTF(res.c_str());
+	   return;
 }
 
 
-
-
-
-
-
-
-
-
-
-
-//const char *path = env->GetStringUTFChars(directory,NULL);
-//			const char *key = env->GetStringUTFChars(keyword, NULL);
-//			struct dirent *entry;
-//			std::string res;
-//			DIR *dir = opendir(path);
-//			if (dir == NULL) {
-//			   return env->NewStringUTF("No files to display");
-//			}
-//			else{
-//
-//			  while ((entry = readdir(dir)) != NULL) {
-//			       string st = entry->d_name;
-//			       string k = key;
-//			       string direc = path;
-//
-//			       transform(st.begin(), st.end(), st.begin(), ::tolower);
-//			       transform(k.begin(), k.end(), k.begin(), ::tolower);
-//			       if(st.find(k) !=string::npos){
-//			    	   res = res + "," + st;
-//
-//			       }
-//
-//			   }
-//
-//
-//
-//			   }
-//			 closedir(dir);
-//			 return env->NewStringUTF(res.c_str());
